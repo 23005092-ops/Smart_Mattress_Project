@@ -1,0 +1,654 @@
+[
+  {
+    "timestamp": "2026-01-10T20:44:11.601706",
+    "action": "chat",
+    "user": "user",
+    "target_id": null,
+    "meta": {
+      "query": "how to sleep better?",
+      "reply_backend": "rule-based"
+    }
+  },
+  {
+    "timestamp": "2026-01-10T20:44:14.512474",
+    "action": "chat",
+    "user": "user",
+    "target_id": null,
+    "meta": {
+      "query": "how to sleep better?",
+      "reply_backend": "rule-based"
+    }
+  },
+  {
+    "timestamp": "2026-01-10T21:25:01.818779",
+    "action": "emergency_deflated",
+    "user": "user",
+    "target_id": null,
+    "meta": {
+      "reason": "manual"
+    }
+  },
+  {
+    "timestamp": "2026-01-10T21:25:25.600108",
+    "action": "emergency_reinflated",
+    "user": "user",
+    "target_id": null,
+    "meta": null
+  },
+  {
+    "timestamp": "2026-01-11T00:12:09.972353",
+    "action": "emergency_deflated",
+    "user": "user",
+    "target_id": null,
+    "meta": {
+      "reason": "manual"
+    }
+  },
+  {
+    "timestamp": "2026-01-11T00:36:44.580203",
+    "action": "chat",
+    "user": "user",
+    "target_id": null,
+    "meta": {
+      "query": "should i eat more vegetable",
+      "reply_backend": "rule-based"
+    }
+  },
+  {
+    "timestamp": "2026-01-11T00:36:44.583337",
+    "action": "chat",
+    "user": "user",
+    "target_id": null,
+    "meta": {
+      "query": "should i eat more vegetable",
+      "reply_backend": "rule-based"
+    }
+  },
+  {
+    "timestamp": "2026-01-11T00:36:46.914962",
+    "action": "chat",
+    "user": "user",
+    "target_id": null,
+    "meta": {
+      "query": "should i eat more vegetable",
+      "reply_backend": "rule-based"
+    }
+  },
+  {
+    "timestamp": "2026-01-11T00:36:46.949520",
+    "action": "chat",
+    "user": "user",
+    "target_id": null,
+    "meta": {
+      "query": "should i eat more vegetable",
+      "reply_backend": "rule-based"
+    }
+  },
+  {
+    "timestamp": "2026-01-11T00:36:48.154181",
+    "action": "chat",
+    "user": "user",
+    "target_id": null,
+    "meta": {
+      "query": "should i eat more vegetable",
+      "reply_backend": "rule-based"
+    }
+  },
+  {
+    "timestamp": "2026-01-11T00:36:48.182714",
+    "action": "chat",
+    "user": "user",
+    "target_id": null,
+    "meta": {
+      "query": "should i eat more vegetable",
+      "reply_backend": "rule-based"
+    }
+  },
+  {
+    "timestamp": "2026-01-11T00:37:09.397843",
+    "action": "chat",
+    "user": "user",
+    "target_id": null,
+    "meta": {
+      "query": "how to sleep hygienly",
+      "reply_backend": "rule-based"
+    }
+  },
+  {
+    "timestamp": "2026-01-11T00:37:09.428808",
+    "action": "chat",
+    "user": "user",
+    "target_id": null,
+    "meta": {
+      "query": "how to sleep hygienly",
+      "reply_backend": "rule-based"
+    }
+  },
+  {
+    "timestamp": "2026-01-11T00:37:13.787728",
+    "action": "chat",
+    "user": "user",
+    "target_id": null,
+    "meta": {
+      "query": "how to sleep hygienly",
+      "reply_backend": "rule-based"
+    }
+  },
+  {
+    "timestamp": "2026-01-11T00:37:13.814652",
+    "action": "chat",
+    "user": "user",
+    "target_id": null,
+    "meta": {
+      "query": "how to sleep hygienly",
+      "reply_backend": "rule-based"
+    }
+  },
+  {
+    "timestamp": "2026-01-11T00:37:38.902679",
+    "action": "chat",
+    "user": "user",
+    "target_id": null,
+    "meta": {
+      "query": "interpret my sleep metrics",
+      "reply_backend": "rule-based"
+    }
+  },
+  {
+    "timestamp": "2026-01-11T00:37:38.932273",
+    "action": "chat",
+    "user": "user",
+    "target_id": null,
+    "meta": {
+      "query": "interpret my sleep metrics",
+      "reply_backend": "rule-based"
+    }
+  },
+  {
+    "timestamp": "2026-01-11T00:37:42.648636",
+    "action": "chat",
+    "user": "user",
+    "target_id": null,
+    "meta": {
+      "query": "interpret my sleep metrics",
+      "reply_backend": "rule-based"
+    }
+  },
+  {
+    "timestamp": "2026-01-11T00:37:42.681208",
+    "action": "chat",
+    "user": "user",
+    "target_id": null,
+    "meta": {
+      "query": "interpret my sleep metrics",
+      "reply_backend": "rule-based"
+    }
+  },
+  {
+    "timestamp": "2026-01-11T08:30:00.428048",
+    "action": "emergency_deflated",
+    "user": "user",
+    "target_id": null,
+    "meta": {
+      "reason": "manual"
+    }
+  },
+  {
+    "timestamp": "2026-01-11T08:30:20.649383",
+    "action": "emergency_reinflated",
+    "user": "user",
+    "target_id": null,
+    "meta": null
+  },
+  {
+    "timestamp": "2026-01-11T08:32:30.672379",
+    "action": "emergency_deflated",
+    "user": "user",
+    "target_id": null,
+    "meta": {
+      "reason": "manual"
+    }
+  },
+  {
+    "timestamp": "2026-01-11T08:33:06.614293",
+    "action": "emergency_deflated",
+    "user": "user",
+    "target_id": null,
+    "meta": {
+      "reason": "manual"
+    }
+  },
+  {
+    "timestamp": "2026-01-11T08:42:37.465790",
+    "action": "emergency_deflated",
+    "user": "user",
+    "target_id": null,
+    "meta": {
+      "reason": "manual"
+    }
+  },
+  {
+    "timestamp": "2026-01-11T08:58:54.182579",
+    "action": "emergency_deflated",
+    "user": "user",
+    "target_id": null,
+    "meta": {
+      "reason": "manual"
+    }
+  },
+  {
+    "timestamp": "2026-01-11T08:59:50.541828",
+    "action": "emergency_deflated",
+    "user": "user",
+    "target_id": null,
+    "meta": {
+      "reason": "manual"
+    }
+  },
+  {
+    "timestamp": "2026-01-11T09:11:15.959155",
+    "action": "emergency_deflated",
+    "user": "user",
+    "target_id": null,
+    "meta": {
+      "reason": "manual"
+    }
+  },
+  {
+    "timestamp": "2026-01-11T09:12:04.109016",
+    "action": "emergency_reinflated",
+    "user": "user",
+    "target_id": null,
+    "meta": null
+  },
+  {
+    "timestamp": "2026-01-11T09:12:17.593270",
+    "action": "emergency_deflated",
+    "user": "user",
+    "target_id": null,
+    "meta": {
+      "reason": "manual"
+    }
+  },
+  {
+    "timestamp": "2026-01-11T09:16:24.172776",
+    "action": "emergency_deflated",
+    "user": "user",
+    "target_id": null,
+    "meta": {
+      "reason": "manual"
+    }
+  },
+  {
+    "timestamp": "2026-01-11T09:17:23.466746",
+    "action": "emergency_deflated",
+    "user": "user",
+    "target_id": null,
+    "meta": {
+      "reason": "manual"
+    }
+  },
+  {
+    "timestamp": "2026-01-11T09:21:06.203602",
+    "action": "emergency_deflated",
+    "user": "user",
+    "target_id": null,
+    "meta": {
+      "reason": "manual"
+    }
+  },
+  {
+    "timestamp": "2026-01-11T09:21:37.626224",
+    "action": "emergency_reinflated",
+    "user": "user",
+    "target_id": null,
+    "meta": null
+  },
+  {
+    "timestamp": "2026-01-11T09:22:43.479863",
+    "action": "emergency_deflated",
+    "user": "user",
+    "target_id": null,
+    "meta": {
+      "reason": "manual"
+    }
+  },
+  {
+    "timestamp": "2026-01-11T09:22:51.552604",
+    "action": "emergency_reinflated",
+    "user": "user",
+    "target_id": null,
+    "meta": null
+  },
+  {
+    "timestamp": "2026-01-11T09:26:24.386139",
+    "action": "emergency_deflated",
+    "user": "user",
+    "target_id": null,
+    "meta": {
+      "reason": "manual"
+    }
+  },
+  {
+    "timestamp": "2026-01-11T09:28:55.716234",
+    "action": "emergency_deflated",
+    "user": "user",
+    "target_id": null,
+    "meta": {
+      "reason": "manual"
+    }
+  },
+  {
+    "timestamp": "2026-01-11T09:31:33.747843",
+    "action": "emergency_deflated",
+    "user": "user",
+    "target_id": null,
+    "meta": {
+      "reason": "manual"
+    }
+  },
+  {
+    "timestamp": "2026-01-11T09:31:41.538558",
+    "action": "emergency_reinflated",
+    "user": "user",
+    "target_id": null,
+    "meta": null
+  },
+  {
+    "timestamp": "2026-01-11T09:32:06.146228",
+    "action": "emergency_deflated",
+    "user": "user",
+    "target_id": null,
+    "meta": {
+      "reason": "manual"
+    }
+  },
+  {
+    "timestamp": "2026-01-11T09:34:35.486523",
+    "action": "emergency_deflated",
+    "user": "user",
+    "target_id": null,
+    "meta": {
+      "reason": "manual"
+    }
+  },
+  {
+    "timestamp": "2026-01-11T09:34:42.408409",
+    "action": "emergency_reinflated",
+    "user": "user",
+    "target_id": null,
+    "meta": null
+  },
+  {
+    "timestamp": "2026-01-11T09:34:48.031420",
+    "action": "emergency_deflated",
+    "user": "user",
+    "target_id": null,
+    "meta": {
+      "reason": "manual"
+    }
+  },
+  {
+    "timestamp": "2026-01-11T09:34:54.054033",
+    "action": "emergency_reinflated",
+    "user": "user",
+    "target_id": null,
+    "meta": null
+  },
+  {
+    "timestamp": "2026-01-11T09:34:58.646836",
+    "action": "emergency_deflated",
+    "user": "user",
+    "target_id": null,
+    "meta": {
+      "reason": "manual"
+    }
+  },
+  {
+    "timestamp": "2026-01-11T09:36:50.817667",
+    "action": "emergency_deflated",
+    "user": "user",
+    "target_id": null,
+    "meta": {
+      "reason": "manual"
+    }
+  },
+  {
+    "timestamp": "2026-01-11T09:37:01.117200",
+    "action": "emergency_reinflated",
+    "user": "user",
+    "target_id": null,
+    "meta": null
+  },
+  {
+    "timestamp": "2026-01-11T09:37:38.917221",
+    "action": "emergency_deflated",
+    "user": "user",
+    "target_id": null,
+    "meta": {
+      "reason": "manual"
+    }
+  },
+  {
+    "timestamp": "2026-01-11T09:40:48.000895",
+    "action": "emergency_deflated",
+    "user": "user",
+    "target_id": null,
+    "meta": {
+      "reason": "manual"
+    }
+  },
+  {
+    "timestamp": "2026-01-11T09:40:55.705893",
+    "action": "emergency_reinflated",
+    "user": "user",
+    "target_id": null,
+    "meta": null
+  },
+  {
+    "timestamp": "2026-01-11T09:42:59.998419",
+    "action": "emergency_deflated",
+    "user": "user",
+    "target_id": null,
+    "meta": {
+      "reason": "manual"
+    }
+  },
+  {
+    "timestamp": "2026-01-11T09:43:06.447131",
+    "action": "emergency_reinflated",
+    "user": "user",
+    "target_id": null,
+    "meta": null
+  },
+  {
+    "timestamp": "2026-01-11T09:43:38.409180",
+    "action": "emergency_deflated",
+    "user": "user",
+    "target_id": null,
+    "meta": {
+      "reason": "manual"
+    }
+  },
+  {
+    "timestamp": "2026-01-11T09:43:53.944758",
+    "action": "emergency_reinflated",
+    "user": "user",
+    "target_id": null,
+    "meta": null
+  },
+  {
+    "timestamp": "2026-01-11T09:47:10.426915",
+    "action": "chat",
+    "user": "user",
+    "target_id": null,
+    "meta": {
+      "query": "how to sleep better",
+      "reply_backend": "rule-based"
+    }
+  },
+  {
+    "timestamp": "2026-01-11T09:47:10.443075",
+    "action": "chat",
+    "user": "user",
+    "target_id": null,
+    "meta": {
+      "query": "how to sleep better",
+      "reply_backend": "rule-based"
+    }
+  },
+  {
+    "timestamp": "2026-01-11T09:47:13.031627",
+    "action": "chat",
+    "user": "user",
+    "target_id": null,
+    "meta": {
+      "query": "how to sleep better",
+      "reply_backend": "rule-based"
+    }
+  },
+  {
+    "timestamp": "2026-01-11T09:47:13.045355",
+    "action": "chat",
+    "user": "user",
+    "target_id": null,
+    "meta": {
+      "query": "how to sleep better",
+      "reply_backend": "rule-based"
+    }
+  },
+  {
+    "timestamp": "2026-01-11T09:50:02.860846",
+    "action": "chat",
+    "user": "user",
+    "target_id": null,
+    "meta": {
+      "query": "how to sleep better",
+      "reply_backend": "rule-based"
+    }
+  },
+  {
+    "timestamp": "2026-01-11T09:50:02.875208",
+    "action": "chat",
+    "user": "user",
+    "target_id": null,
+    "meta": {
+      "query": "how to sleep better",
+      "reply_backend": "rule-based"
+    }
+  },
+  {
+    "timestamp": "2026-01-11T09:50:07.712765",
+    "action": "chat",
+    "user": "user",
+    "target_id": null,
+    "meta": {
+      "query": "how to sleep better",
+      "reply_backend": "rule-based"
+    }
+  },
+  {
+    "timestamp": "2026-01-11T09:50:07.725870",
+    "action": "chat",
+    "user": "user",
+    "target_id": null,
+    "meta": {
+      "query": "how to sleep better",
+      "reply_backend": "rule-based"
+    }
+  },
+  {
+    "timestamp": "2026-01-11T09:50:53.790617",
+    "action": "chat",
+    "user": "user",
+    "target_id": null,
+    "meta": {
+      "query": "tell me about my last night sleep",
+      "reply_backend": "rule-based"
+    }
+  },
+  {
+    "timestamp": "2026-01-11T09:50:53.805904",
+    "action": "chat",
+    "user": "user",
+    "target_id": null,
+    "meta": {
+      "query": "tell me about my last night sleep",
+      "reply_backend": "rule-based"
+    }
+  },
+  {
+    "timestamp": "2026-01-11T09:50:57.829853",
+    "action": "chat",
+    "user": "user",
+    "target_id": null,
+    "meta": {
+      "query": "tell me about my last night sleep",
+      "reply_backend": "rule-based"
+    }
+  },
+  {
+    "timestamp": "2026-01-11T09:50:57.841282",
+    "action": "chat",
+    "user": "user",
+    "target_id": null,
+    "meta": {
+      "query": "tell me about my last night sleep",
+      "reply_backend": "rule-based"
+    }
+  },
+  {
+    "timestamp": "2026-01-11T09:59:05.354274",
+    "action": "faq_asked",
+    "user": "user",
+    "target_id": null,
+    "meta": {
+      "question": "When should I see a doctor for insomnia?"
+    }
+  },
+  {
+    "timestamp": "2026-01-11T09:59:10.827176",
+    "action": "faq_asked",
+    "user": "user",
+    "target_id": null,
+    "meta": {
+      "question": "When should I see a doctor for insomnia?"
+    }
+  },
+  {
+    "timestamp": "2026-01-11T09:59:12.166355",
+    "action": "faq_asked",
+    "user": "user",
+    "target_id": null,
+    "meta": {
+      "question": "When should I see a doctor for insomnia?"
+    }
+  },
+  {
+    "timestamp": "2026-01-11T09:59:12.348991",
+    "action": "faq_asked",
+    "user": "user",
+    "target_id": null,
+    "meta": {
+      "question": "When should I see a doctor for insomnia?"
+    }
+  },
+  {
+    "timestamp": "2026-01-11T10:01:46.527530",
+    "action": "faq_asked",
+    "user": "user",
+    "target_id": null,
+    "meta": {
+      "question": "Is napping okay and how long should I nap?"
+    }
+  },
+  {
+    "timestamp": "2026-01-11T10:01:48.933652",
+    "action": "faq_asked",
+    "user": "user",
+    "target_id": null,
+    "meta": {
+      "question": "Is napping okay and how long should I nap?"
+    }
+  }
+]
