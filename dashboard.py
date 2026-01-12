@@ -573,8 +573,7 @@ if page == 'Dashboard':
           const p = document.getElementById('sleep_tracking_page'); if(p) p.remove();
 
           document.querySelectorAll('body *').forEach(el=>{
-            // skip if element already cleaned
-            if(!el || (el.dataset && el.dataset.cleaned_by_cleanup)) return;
+            if(!el || el.dataset || el.dataset.cleaned_by_cleanup) return;
             const text = (el.innerText || '').toLowerCase().trim();
             if(!text) return;
             for(const lab of labels){
@@ -582,7 +581,7 @@ if page == 'Dashboard':
                 // hide a reasonable ancestor container (walk up a few levels)
                 let node = el;
                 for(let i=0;i<10 && node;i++) node = node.parentElement;
-                if(node){ node.style.display='none'; node.setAttribute('data-cleaned-by-cleanup','1'); }
+                if(node){ node.style.display='none'; node.dataset.cleaned_by_cleanup='1'; }
                 break;
               }
             }
@@ -608,51 +607,22 @@ if page == 'Sleep Tracking':
         # Create a checkbox bound to the key 'persist_sleep' so Streamlit handles session state for us
         persist_sleep = st.sidebar.checkbox("Persist sleep history to disk", value=True, key='persist_sleep')
 
-        # Debug marker: visible box to confirm rendering (avoid using the word 'sleep' to bypass cleanup regex)
-        st.markdown("<div id='st_rendered_marker' style='border:2px solid #9cff8a;padding:8px;border-radius:6px;color:#9cff8a;margin-bottom:8px;'>ST_RENDERED_MARKER</div>", unsafe_allow_html=True)
-
-        # Reverse any prior client-side cleanup (unhide nodes and remove cleanup flags) so Sleep Tracking shows correctly
-        components.html('''
-        <script>
-        (function(){
-          try{
-            // Remove the cleanup attribute set earlier and unhide those nodes
-            document.querySelectorAll('[data-cleaned-by-cleanup]').forEach(function(e){ e.removeAttribute('data-cleaned-by-cleanup'); e.style.display=''; });
-            // Also unhide any known containers by id
-            ['sleep_coach_container','sleep_tracking_page','st_rendered_marker'].forEach(function(id){ var el=document.getElementById(id); if(el){ el.style.display=''; }});
-            // Unhide any ancestor that contains sleep/coach/deep/light text
-            document.querySelectorAll('body *').forEach(function(el){
-              try{
-                var t = (el.innerText||'').toLowerCase();
-                if(t.indexOf('sleep')!==-1 || t.indexOf('coach')!==-1 || t.indexOf('deep')!==-1 || t.indexOf('light')!==-1){
-                  var node = el; for(var i=0;i<8 && node;i++){ node.style.display=''; node = node.parentElement; }
-                }
-              }catch(e){}
-            });
-          }catch(e){}
-        })();
-        </script>
-        ''', height=0)
-
-        # Debug: show key session state values to help diagnose blank page issues
-        st.caption(f"DEBUG: page={page} demo_override={st.session_state.get('demo_override',False)} doctor_view={st.session_state.get('doctor_view',False)} sleep_history_len={len(st.session_state.get('sleep_history',[]))}")
-
-        # Helper: load/save JSON sleep history (keeps meta fields, intervals, deleted flags)
-        def load_sleep_history():
-            if os.path.exists(SLEEP_HISTORY_JSON_PATH):
-                try:
-                    with open(SLEEP_HISTORY_JSON_PATH, 'r') as f:
-                        return json.load(f)
-                except Exception:
-                    return []
-            # fallback: if CSV exists, load and convert
-            if os.path.exists(SLEEP_HISTORY_CSV_PATH):
-                try:
-                    df = pd.read_csv(SLEEP_HISTORY_CSV_PATH)
-                    return df.to_dict(orient='records')
-                except Exception:
-                    return []
-            return []
+    # Helper: load/save JSON sleep history (keeps meta fields, intervals, deleted flags)
+    def load_sleep_history():
+        if os.path.exists(SLEEP_HISTORY_JSON_PATH):
+            try:
+                with open(SLEEP_HISTORY_JSON_PATH, 'r') as f:
+                    return json.load(f)
+            except Exception:
+                return []
+        # fallback: if CSV exists, load and convert
+        if os.path.exists(SLEEP_HISTORY_CSV_PATH):
+            try:
+                df = pd.read_csv(SLEEP_HISTORY_CSV_PATH)
+                return df.to_dict(orient='records')
+            except Exception:
+                return []
+        return []
 
     def save_sleep_history(list_of_records):
         try:
