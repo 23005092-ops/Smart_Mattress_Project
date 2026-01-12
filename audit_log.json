@@ -650,5 +650,30 @@
     "meta": {
       "question": "Is napping okay and how long should I nap?"
     }
+  },
+  {
+    "timestamp": "2026-01-12T15:33:33.137701",
+    "action": "emergency_deflated",
+    "user": "user",
+    "target_id": null,
+    "meta": {
+      "reason": "manual"
+    }
+  },
+  {
+    "timestamp": "2026-01-12T15:33:45.197774",
+    "action": "emergency_reinflated",
+    "user": "user",
+    "target_id": null,
+    "meta": null
+  },
+  {
+    "timestamp": "2026-01-12T15:35:22.790795",
+    "action": "manual_record",
+    "user": "user",
+    "target_id": "a6f2d172-dcb9-4170-950c-611991da9bcf",
+    "meta": {
+      "sleep_score": 76
+    }
   }
 ]

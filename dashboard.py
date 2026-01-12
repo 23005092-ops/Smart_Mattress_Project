@@ -359,7 +359,8 @@ def _finalize_sleep_record(start_ts, end_ts, sensors_df=None, vitals=None):
     }
     # Append and persist
     st.session_state['sleep_history'].append(rec)
-    if persist_sleep:
+    # Use session-backed persist flag (defaults to True) so this works even when called from other pages
+    if st.session_state.get('persist_sleep', True):
         save_sleep_history(st.session_state['sleep_history'])
     append_audit('auto_recorded_by_detector', user='system', target_id=rec['id'], meta={'start':str(start_ts), 'end':str(end_ts), 'total_h':hours})
 
@@ -430,6 +431,16 @@ if 'last_page' not in st.session_state:
 elif st.session_state['last_page'] != page:
     st.session_state['last_page'] = page
     st.session_state['hr_metric_rendered'] = False
+    # Clear a few transient page-specific flags to avoid leaking Sleep Tracking UI into the Dashboard
+    if page == 'Dashboard':
+        st.session_state.pop('doctor_view', None)
+        st.session_state.pop('doctor_demo_generated', None)
+        # Remove stale widget keys created by Sleep Tracking
+        st.session_state.pop('select_sleep_record', None)
+        st.session_state.pop('close_doctor_view', None)
+
+# Create a persistent placeholder we can empty when navigating away from Sleep Tracking
+sleep_placeholder = st.empty()
 
 # Demo override (global): big visible toggle for demoing with simulated data
 if 'demo_override' not in st.session_state:
@@ -541,32 +552,107 @@ else:
 # --- 6. MAIN DASHBOARD LAYOUT ---
 st.title("AI POWERED SMART MATTRESS")
 
+# Client-side cleanup when on Dashboard: hide any leftover Sleep Tracking DOM nodes that
+# can occasionally persist due to client-side rendering behaviors (labels like "Sleep Score",
+# "Total Sleep", "Sleep Coach Chat", etc.). This runs only when the Dashboard is active.
+if page == 'Dashboard':
+    # Ensure any server-side placeholder content for Sleep Tracking is removed
+    try:
+        sleep_placeholder.empty()
+    except Exception:
+        pass
+
+    components.html('''
+    <script>
+    (function(){
+      const labels = ['sleep score','total sleep','sleep efficiency','avg hr','stage breakdown','sleep coach chat','coach tips','rem','deep','light'];
+      function hideLabels(){
+        try{
+          // Try to remove specific containers by id first (reliable)
+          const s = document.getElementById('sleep_coach_container'); if(s) s.remove();
+          const p = document.getElementById('sleep_tracking_page'); if(p) p.remove();
+
+          document.querySelectorAll('body *').forEach(el=>{
+            // skip if element already cleaned
+            if(!el || (el.dataset && el.dataset.cleaned_by_cleanup)) return;
+            const text = (el.innerText || '').toLowerCase().trim();
+            if(!text) return;
+            for(const lab of labels){
+              if(text.indexOf(lab) !== -1){
+                // hide a reasonable ancestor container (walk up a few levels)
+                let node = el;
+                for(let i=0;i<10 && node;i++) node = node.parentElement;
+                if(node){ node.style.display='none'; node.setAttribute('data-cleaned-by-cleanup','1'); }
+                break;
+              }
+            }
+          });
+        }catch(e){ /* ignore */ }
+      }
+      setTimeout(hideLabels, 50);
+      let runs=0; let iv=setInterval(()=>{ hideLabels(); if(++runs>40) clearInterval(iv); }, 200);
+    })();
+    </script>
+    ''', height=0)
+
 # Emergency banner intentionally omitted to avoid layout churn when safety actions occur.
 # Dashboard will remain visually unchanged; only internal metrics and bladder states update on emergency deflate/reinflate.
 
 # --- Sleep Tracking page (separate view) ---
 if page == 'Sleep Tracking':
-    st.header("Sleep Tracking")
+    # Render all Sleep Tracking UI inside a stable placeholder so we can clear it on page switch
+    with sleep_placeholder.container():
+        st.header("Sleep Tracking")
 
-    # Persistence toggle (sidebar control also available)
-    persist_sleep = st.sidebar.checkbox("Persist sleep history to disk", value=True)
+        # Persistence toggle (sidebar control also available)
+        # Create a checkbox bound to the key 'persist_sleep' so Streamlit handles session state for us
+        persist_sleep = st.sidebar.checkbox("Persist sleep history to disk", value=True, key='persist_sleep')
 
-    # Helper: load/save JSON sleep history (keeps meta fields, intervals, deleted flags)
-    def load_sleep_history():
-        if os.path.exists(SLEEP_HISTORY_JSON_PATH):
-            try:
-                with open(SLEEP_HISTORY_JSON_PATH, 'r') as f:
-                    return json.load(f)
-            except Exception:
-                return []
-        # fallback: if CSV exists, load and convert
-        if os.path.exists(SLEEP_HISTORY_CSV_PATH):
-            try:
-                df = pd.read_csv(SLEEP_HISTORY_CSV_PATH)
-                return df.to_dict(orient='records')
-            except Exception:
-                return []
-        return []
+        # Debug marker: visible box to confirm rendering (avoid using the word 'sleep' to bypass cleanup regex)
+        st.markdown("<div id='st_rendered_marker' style='border:2px solid #9cff8a;padding:8px;border-radius:6px;color:#9cff8a;margin-bottom:8px;'>ST_RENDERED_MARKER</div>", unsafe_allow_html=True)
+
+        # Reverse any prior client-side cleanup (unhide nodes and remove cleanup flags) so Sleep Tracking shows correctly
+        components.html('''
+        <script>
+        (function(){
+          try{
+            // Remove the cleanup attribute set earlier and unhide those nodes
+            document.querySelectorAll('[data-cleaned-by-cleanup]').forEach(function(e){ e.removeAttribute('data-cleaned-by-cleanup'); e.style.display=''; });
+            // Also unhide any known containers by id
+            ['sleep_coach_container','sleep_tracking_page','st_rendered_marker'].forEach(function(id){ var el=document.getElementById(id); if(el){ el.style.display=''; }});
+            // Unhide any ancestor that contains sleep/coach/deep/light text
+            document.querySelectorAll('body *').forEach(function(el){
+              try{
+                var t = (el.innerText||'').toLowerCase();
+                if(t.indexOf('sleep')!==-1 || t.indexOf('coach')!==-1 || t.indexOf('deep')!==-1 || t.indexOf('light')!==-1){
+                  var node = el; for(var i=0;i<8 && node;i++){ node.style.display=''; node = node.parentElement; }
+                }
+              }catch(e){}
+            });
+          }catch(e){}
+        })();
+        </script>
+        ''', height=0)
+
+        # Debug: show key session state values to help diagnose blank page issues
+        st.caption(f"DEBUG: page={page} demo_override={st.session_state.get('demo_override',False)} doctor_view={st.session_state.get('doctor_view',False)} sleep_history_len={len(st.session_state.get('sleep_history',[]))}")
+
+        # Helper: load/save JSON sleep history (keeps meta fields, intervals, deleted flags)
+        def load_sleep_history():
+            if os.path.exists(SLEEP_HISTORY_JSON_PATH):
+                try:
+                    with open(SLEEP_HISTORY_JSON_PATH, 'r') as f:
+                        return json.load(f)
+                except Exception:
+                    return []
+            # fallback: if CSV exists, load and convert
+            if os.path.exists(SLEEP_HISTORY_CSV_PATH):
+                try:
+                    df = pd.read_csv(SLEEP_HISTORY_CSV_PATH)
+                    return df.to_dict(orient='records')
+                except Exception:
+                    return []
+            return []
 
     def save_sleep_history(list_of_records):
         try:
@@ -643,9 +729,10 @@ if page == 'Sleep Tracking':
 
     # If doctor unlocked, show a button to view unedited sleep history
     if st.session_state.get('is_doctor', False):
-        if st.sidebar.button('Show unedited sleep history'):
+        if st.sidebar.button('Show unedited sleep history', key='show_unedited_sleep_history'):
             st.session_state['doctor_view'] = True
-            st.experimental_rerun()
+            # Use st.stop() to end the current run and allow the updated flag to be displayed immediately
+            st.stop()
 
     # Repository mode: when enabled by admin, nightly auto-records become locked and cannot be deleted by users
     # Repository mode (admin only). Changing this emits an audit entry.
@@ -701,9 +788,10 @@ if page == 'Sleep Tracking':
             st.info('No records available.')
         else:
             st.dataframe(df.sort_values('timestamp', ascending=False).reset_index(drop=True))
-        if st.button('Close doctor view'):
+        if st.button('Close doctor view', key='close_doctor_view'):
             st.session_state['doctor_view'] = False
-            st.experimental_rerun()
+            # Use st.stop() to end the current run and allow the updated flag to be displayed immediately
+            st.stop()
         st.stop()
 
     # Deprecated: automatic morning auto-recording removed in favor of live sleep-detection; the system will record a daily entry when it detects a sleep session via sensors/vitals.
@@ -714,27 +802,6 @@ if page == 'Sleep Tracking':
     heat_dp, presence_sensors = get_pressure_data(mode=device_mode, demo=demo_mode, massage_intensity=massage_intensity)
     presence_threshold = max(8.0, float(threshold_pressure) * 0.6)
     user_present = float(presence_sensors['mmHg'].max()) > presence_threshold
-
-    # In demo mode, compute a single consistent set of dummy sleep metrics and reuse them across modes
-    if demo_mode:
-        if 'demo_sleep_metrics' not in st.session_state:
-            # use a date-based seed so demo values are stable across reruns and identical across modes for the day
-            seed = int(datetime.now().strftime('%Y%m%d'))
-            rng_demo = np.random.default_rng(seed)
-            demo_metrics = {}
-            demo_metrics['sleep_score'] = int(np.clip(78 + rng_demo.normal(0, 6), 40, 100))
-            demo_metrics['total_sleep_h'] = float(np.clip(7.0 + rng_demo.normal(0, 0.8), 3.0, 12.0))
-            demo_metrics['sleep_eff'] = int(np.clip(88 + rng_demo.normal(0, 6), 40, 100))
-            demo_metrics['rem_pct'] = int(np.clip(18 + rng_demo.normal(0,4), 0, 60))
-            demo_metrics['deep_pct'] = int(np.clip(18 + rng_demo.normal(0,4), 0, 60))
-            demo_metrics['light_pct'] = max(0, 100 - demo_metrics['rem_pct'] - demo_metrics['deep_pct'])
-            demo_metrics['avg_hr'] = float(np.clip(62 + rng_demo.normal(0,3), 30, 110))
-            demo_metrics['avg_rr'] = float(np.clip(14 + rng_demo.normal(0,2), 6, 30))
-            demo_metrics['avg_spo2'] = float(np.clip(97 + rng_demo.normal(0,0.8), 85, 100))
-            st.session_state['demo_sleep_metrics'] = demo_metrics
-    else:
-        # clear any demo metrics when demo mode is turned off
-        st.session_state.pop('demo_sleep_metrics', None)
 
     # If the bed is empty (and not in demo mode), hide sleep metrics and zero vitals. In demo mode or when the
     # user is present, compute sleep metrics the same way for all device modes.
@@ -754,32 +821,36 @@ if page == 'Sleep Tracking':
         allow_manual_record = False
         st.info('No user detected — sleep metrics unavailable while bed is empty; vitals set to 0.')
     else:
-        # Demo or user present: use demo metrics if demo mode, otherwise generate per-present-user metrics
-        if demo_mode:
-            dm = st.session_state.get('demo_sleep_metrics', {})
-            sleep_score = dm.get('sleep_score')
-            total_sleep_h = dm.get('total_sleep_h')
-            sleep_eff = dm.get('sleep_eff')
-            rem_pct = dm.get('rem_pct')
-            deep_pct = dm.get('deep_pct')
-            light_pct = dm.get('light_pct')
-            avg_hr = dm.get('avg_hr')
-            avg_rr = dm.get('avg_rr')
-            avg_spo2 = dm.get('avg_spo2')
-            allow_manual_record = True
-        else:
-            rng = np.random.default_rng()
-            sleep_score = int(np.clip(78 + rng.normal(0, 6), 40, 100))
-            total_sleep_h = float(np.clip(7.0 + rng.normal(0, 0.8), 3.0, 12.0))
-            sleep_eff = int(np.clip(88 + rng.normal(0, 6), 40, 100))
-            rem_pct = int(np.clip(18 + rng.normal(0,4), 0, 60))
-            deep_pct = int(np.clip(18 + rng.normal(0,4), 0, 60))
-            light_pct = max(0, 100 - rem_pct - deep_pct)
-            # Average vitals for demo/user-present
-            avg_hr = float(np.clip(62 + rng.normal(0,3), 30, 110))
-            avg_rr = float(np.clip(14 + rng.normal(0,2), 6, 30))
-            avg_spo2 = float(np.clip(97 + rng.normal(0,0.8), 85, 100))
-            allow_manual_record = True
+        # Demo or user present: generate demo/dummy sleep metrics
+        rng = np.random.default_rng()
+        sleep_score = int(np.clip(78 + rng.normal(0, 6), 40, 100))
+        total_sleep_h = float(np.clip(7.0 + rng.normal(0, 0.8), 3.0, 12.0))
+        sleep_eff = int(np.clip(88 + rng.normal(0, 6), 40, 100))
+        rem_pct = int(np.clip(18 + rng.normal(0,4), 0, 60))
+        deep_pct = int(np.clip(18 + rng.normal(0,4), 0, 60))
+        light_pct = max(0, 100 - rem_pct - deep_pct)
+        # Ensure session vitals are present and up-to-date so Sleep Tracking shows the same values
+        if 'vitals' not in st.session_state:
+            st.session_state['vitals'] = {'hr': 62.0, 'spo2': 98.0, 'vo2': 20.0, 'rr': 14.0}
+        # If demo just started, apply immediate bump and then ensure 3s cadence updates are applied here
+        demo_now = st.session_state.get('demo_override', False)
+        now_ts_local = time.time()
+        last_demo_local = st.session_state.get('last_demo_override', False)
+        if demo_now and not last_demo_local:
+            st.session_state['vitals']['hr'] = float(np.clip(st.session_state['vitals'].get('hr',62.0) + np.random.uniform(6.0,12.0), 48.0, 130.0))
+            st.session_state['last_vitals_demo_update'] = now_ts_local
+        if demo_now:
+            last_u = st.session_state.get('last_vitals_demo_update', 0.0)
+            if now_ts_local - last_u >= 3.0:
+                st.session_state['vitals']['hr'] = float(np.clip(st.session_state['vitals'].get('hr',62.0) + np.random.normal(0.4,1.6), 48.0, 130.0))
+                st.session_state['last_vitals_demo_update'] = now_ts_local
+        st.session_state['last_demo_override'] = demo_now
+
+        # Use session vitals for display so Dashboard and Sleep Tracking agree
+        avg_hr = round(float(st.session_state['vitals'].get('hr', 62.0)), 1)
+        avg_rr = round(float(st.session_state['vitals'].get('rr', 14.0)), 1)
+        avg_spo2 = round(float(st.session_state['vitals'].get('spo2', 97.0)), 1)
+        allow_manual_record = True
 
     # Show sleep summary metrics here (moved from Dashboard)
     c1, c2, c3, c4 = st.columns(4)
@@ -812,7 +883,7 @@ if page == 'Sleep Tracking':
 
     st.markdown("---")
     st.write("Use the button to record a snapshot of the current simulated sleep metrics into history.")
-    if st.button("Record Sleep Snapshot"):
+    if st.button("Record Sleep Snapshot", key='record_sleep_snapshot'):
         if not allow_manual_record:
             st.warning('No user detected: cannot record a manual snapshot in real use mode.')
         else:
@@ -906,7 +977,7 @@ if page == 'Sleep Tracking':
             cols[1].write('Doctor: read-only (no recover/delete)')
 
         # Toggle to show deleted records
-        show_deleted = st.sidebar.checkbox('Show deleted records', value=False)
+        show_deleted = st.sidebar.checkbox('Show deleted records', value=False, key='show_deleted_records')
 
         # Download CSV of visible (non-deleted unless 'show deleted' selected) records
         visible = [r for r in st.session_state['sleep_history'] if not r.get('deleted', False) or show_deleted]
@@ -922,7 +993,7 @@ if page == 'Sleep Tracking':
         options = [f"{r.get('timestamp','')[:10]} - {r.get('id')[:8]} ({'AUTO' if r.get('auto') else 'MANUAL'})" for r in visible_records_sorted]
         selected = None
         if len(options) > 0:
-            sel = st.selectbox('Select a record to view / annotate', options)
+            sel = st.selectbox('Select a record to view / annotate', options, key='select_sleep_record')
             idx = options.index(sel)
             selected = visible_records_sorted[idx]
 
@@ -1052,7 +1123,9 @@ if page == 'Sleep Tracking':
             color = '#9ad1ff' if who.lower() == 'coach' else '#dcdcdc'
             chat_html += f"<div style='margin-bottom:8px;'><strong style='color:{color};'>{who}</strong>: <span style='color:#eee'>{text}</span></div>"
         chat_html += "</div>"
-        st.markdown(chat_html, unsafe_allow_html=True)
+        # Wrap the chat HTML inside a uniquely identifiable container so we can reliably remove it
+        chat_container = st.container()
+        chat_container.markdown(f"<div id='sleep_coach_container'>{chat_html}</div>", unsafe_allow_html=True)
 
         # Free-text coach input disabled — use the FAQ dropdown below for common questions.
         st.caption('Free-text coach input is currently disabled. Use the FAQ dropdown or the Coach Tips panel for guidance.')
@@ -1232,11 +1305,34 @@ if device_mode in ('Anti-bedsore', 'Massage Mode') and not demo_mode and not use
     v['vo2'] = 0.0
     v['rr'] = 0.0
 else:
-    # small random walk with caps to avoid sudden jumps
-    v['hr'] = float(np.clip(v['hr'] + np.random.normal(0, 0.6), 40, 120))
-    v['spo2'] = float(np.clip(v['spo2'] + np.random.normal(0, 0.1), 85, 100))
-    v['vo2'] = float(np.clip(v['vo2'] + np.random.normal(0, 0.2), 10.0, 40.0))
-    v['rr'] = float(np.clip(v['rr'] + np.random.normal(0, 0.3), 8.0, 30.0))
+    # Vitals update behavior differs when running in demo mode vs real mode.
+    # Demo mode: apply an immediate bump when demo starts and then update vitals every 3 seconds
+    demo_mode_local = st.session_state.get('demo_override', False)
+    now_ts = time.time()
+    # detect demo start transition
+    last_demo = st.session_state.get('last_demo_override', False)
+    if demo_mode_local and not last_demo:
+        # immediate visible bump so user sees the demo take effect
+        v['hr'] = float(np.clip(v['hr'] + float(np.random.uniform(6.0, 12.0)), 48.0, 130.0))
+        st.session_state['last_vitals_demo_update'] = now_ts
+    if demo_mode_local:
+        last_update = st.session_state.get('last_vitals_demo_update', 0.0)
+        # only update every 3 seconds to produce a visible cadence
+        if now_ts - last_update >= 3.0:
+            # stronger, more noticeable random walk during demo
+            v['hr'] = float(np.clip(v['hr'] + np.random.normal(0.4, 1.6), 48.0, 130.0))
+            v['spo2'] = float(np.clip(v['spo2'] + np.random.normal(0, 0.2), 85.0, 100.0))
+            v['vo2'] = float(np.clip(v['vo2'] + np.random.normal(0, 0.4), 10.0, 40.0))
+            v['rr'] = float(np.clip(v['rr'] + np.random.normal(0, 0.5), 8.0, 30.0))
+            st.session_state['last_vitals_demo_update'] = now_ts
+    else:
+        # Normal, subtle random walk with caps to avoid sudden jumps
+        v['hr'] = float(np.clip(v['hr'] + np.random.normal(0, 0.6), 40, 120))
+        v['spo2'] = float(np.clip(v['spo2'] + np.random.normal(0, 0.1), 85, 100))
+        v['vo2'] = float(np.clip(v['vo2'] + np.random.normal(0, 0.2), 10.0, 40.0))
+        v['rr'] = float(np.clip(v['rr'] + np.random.normal(0, 0.3), 8.0, 30.0))
+    # persist last_demo_override
+    st.session_state['last_demo_override'] = demo_mode_local
 
 # Update sleep detector with fresh readings (this will create a daily record when a sleep session ends)
 try:
@@ -1244,10 +1340,8 @@ try:
 except Exception:
     pass
 
-# Guard HR metric to avoid duplicate rendering after emergency actions
-if not st.session_state.get('hr_metric_rendered', False):
-    col4.metric("Heart Rate", f"{v['hr']:.0f} bpm", delta=f"SpO2: {v['spo2']:.0f}%")
-    st.session_state['hr_metric_rendered'] = True
+# Heart Rate metric: update every rerun so changes are visible immediately
+col4.metric("Heart Rate", f"{v['hr']:.0f} bpm", delta=f"SpO2: {v['spo2']:.0f}%")
 # Additional small metrics row
 vm1, vm2, vm3 = st.columns(3)
 vm1.metric("VO2", f"{v['vo2']:.1f} mL/kg/min")

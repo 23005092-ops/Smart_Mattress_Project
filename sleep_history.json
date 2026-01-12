@@ -1,0 +1,69 @@
+[
+  {
+    "id": "a6f2d172-dcb9-4170-950c-611991da9bcf",
+    "timestamp": "2026-01-12T15:35:22.790746",
+    "sleep_score": 76,
+    "total_sleep_h": 5.924462136504689,
+    "sleep_eff": 89,
+    "rem_pct": 17,
+    "deep_pct": 16,
+    "light_pct": 67,
+    "avg_hr": 60.5,
+    "avg_rr": 15.2,
+    "avg_spo2": 97.3,
+    "intervals": [
+      {
+        "index": 0,
+        "quality": 91
+      },
+      {
+        "index": 1,
+        "quality": 95
+      },
+      {
+        "index": 2,
+        "quality": 85
+      },
+      {
+        "index": 3,
+        "quality": 84
+      },
+      {
+        "index": 4,
+        "quality": 94
+      },
+      {
+        "index": 5,
+        "quality": 84
+      },
+      {
+        "index": 6,
+        "quality": 95
+      },
+      {
+        "index": 7,
+        "quality": 80
+      },
+      {
+        "index": 8,
+        "quality": 94
+      },
+      {
+        "index": 9,
+        "quality": 86
+      },
+      {
+        "index": 10,
+        "quality": 94
+      },
+      {
+        "index": 11,
+        "quality": 84
+      }
+    ],
+    "auto": false,
+    "locked": false,
+    "deleted": false,
+    "annotation": null
+  }
+]
